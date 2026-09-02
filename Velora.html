@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Velora - Dashboard</title>
+  <link rel="stylesheet" href="Velora.css">
+</head>
+<body>
+
+  <div class="dashboard-container">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="logo">Velora.</div>
+      <p class="sidebar-label">YOUR DESTINATIONS</p>
+      <nav id="nav-buttons">
+        <button class="destination-btn active" data-id="1">Kyoto, Japan</button>
+        <button class="destination-btn" data-id="2">Zermatt, Switzerland</button>
+        <button class="destination-btn" data-id="3">Ubud, Indonesia</button>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-wrapper">
+      
+      <!-- TOP NAVBAR -->
+      <header class="top-nav">
+        <h2 id="page-title">Dashboard Overview</h2>
+        <div class="user-profile">
+          <span>Hello, Alex</span>
+          <div class="avatar">A</div>
+        </div>
+      </header>
+
+      <!-- DYNAMIC DASHBOARD CONTENT -->
+      <main class="content">
+        
+        <!-- Hero Banner injected by JS -->
+        <div id="destination-hero"></div>
+
+        <!-- Split Layout for Hotels and Attractions -->
+        <div class="split-layout">
+          
+          <div class="column">
+            <h3 class="section-title">Available Hotels</h3>
+            <ul id="hotel-list" class="card-list">
+              <!-- Hotels injected by JS -->
+            </ul>
+          </div>
+
+          <div class="column">
+            <h3 class="section-title">Top Attractions</h3>
+            <ul id="attraction-list" class="card-list">
+              <!-- Attractions injected by JS -->
+            </ul>
+          </div>
+
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
