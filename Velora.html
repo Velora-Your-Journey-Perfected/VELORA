@@ -3,33 +3,132 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Velora - Dashboard</title>
+  <title>Velora - Travel Dashboard</title>
   <link rel="stylesheet" href="Velora.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- IMPORTANT: Replace YOUR_API_KEY with your actual Google Maps API key from https://console.cloud.google.com/ -->
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initializeGoogleMaps"></script>
 </head>
 <body>
 
   <div class="dashboard-container">
     
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <div class="logo">Velora.</div>
-      <p class="sidebar-label">YOUR DESTINATIONS</p>
+    <!-- HAMBURGER MENU BUTTON (Mobile) -->
+    <button class="menu-toggle" id="menu-toggle">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- SLIDING SIDEBAR MENU -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">Velora.</div>
+        <button class="close-btn" id="close-btn">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <p class="sidebar-label">DESTINATIONS</p>
       <nav id="nav-buttons">
-        <button class="destination-btn active" data-id="1">Kyoto, Japan</button>
-        <button class="destination-btn" data-id="2">Zermatt, Switzerland</button>
-        <button class="destination-btn" data-id="3">Ubud, Indonesia</button>
+        <!-- Destination buttons injected by JS -->
       </nav>
+
+      <div class="menu-divider"></div>
+      <p class="sidebar-label">QUICK STATS</p>
+      <div class="quick-stats">
+        <div class="stat-item">
+          <span class="stat-icon">🌍</span>
+          <span id="total-destinations">9</span> Destinations
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">🏨</span>
+          <span id="total-hotels">27</span> Hotels
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">🎯</span>
+          <span id="total-attractions">27</span> Attractions
+        </div>
+      </div>
+
+      <div class="menu-divider"></div>
+      <p class="sidebar-label">FIND YOUR DESTINATION</p>
+      <div class="destination-filters" aria-label="Destination filters">
+        <label class="filter-field" for="terrain-filter">
+          <span>Terrain</span>
+          <select id="terrain-filter" data-filter="terrain">
+            <option value="all">Any terrain</option>
+            <option value="alpine">Alpine</option>
+            <option value="coastal">Coastal</option>
+            <option value="rainforest">Rainforest</option>
+            <option value="urban">Urban</option>
+          </select>
+        </label>
+        <label class="filter-field" for="climate-filter">
+          <span>Climate</span>
+          <select id="climate-filter" data-filter="climate">
+            <option value="all">Any climate</option>
+            <option value="cold">Cold</option>
+            <option value="mediterranean">Mediterranean</option>
+            <option value="temperate">Temperate</option>
+            <option value="tropical">Tropical</option>
+          </select>
+        </label>
+        <label class="filter-field" for="cost-filter">
+          <span>Cost of living</span>
+          <select id="cost-filter" data-filter="costOfLiving">
+            <option value="all">Any cost</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </label>
+        <label class="filter-field" for="luxury-filter">
+          <span>Luxury level</span>
+          <select id="luxury-filter" data-filter="luxuryLevel">
+            <option value="all">Any luxury level</option>
+            <option value="standard">Standard</option>
+            <option value="upscale">Upscale</option>
+            <option value="luxury">Luxury</option>
+          </select>
+        </label>
+        <label class="filter-field" for="attraction-filter">
+          <span>Main attraction</span>
+          <select id="attraction-filter" data-filter="mainAttraction">
+            <option value="all">Any attraction</option>
+            <option value="adventure">Adventure</option>
+            <option value="beach">Beach</option>
+            <option value="culture">Culture</option>
+            <option value="nature">Nature</option>
+          </select>
+        </label>
+        <button class="clear-filters-btn" id="clear-filters" type="button">Clear filters</button>
+      </div>
+
+      <div class="menu-divider"></div>
+      <p class="sidebar-label">CATEGORIES</p>
+      <div class="category-filter">
+        <button class="category-btn active" data-category="all">All Destinations</button>
+        <button class="category-btn" data-category="Culture">Culture</button>
+        <button class="category-btn" data-category="Mountain">Mountain</button>
+        <button class="category-btn" data-category="Beach">Beach</button>
+        <button class="category-btn" data-category="Nature">Nature</button>
+        <button class="category-btn" data-category="Adventure">Adventure</button>
+      </div>
     </aside>
+
+    <!-- OVERLAY (Mobile menu background) -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
     <!-- MAIN CONTENT -->
     <div class="main-wrapper">
       
       <!-- TOP NAVBAR -->
       <header class="top-nav">
-        <h2 id="page-title">Dashboard Overview</h2>
+        <div class="nav-left">
+          <h2 id="page-title">Dashboard Overview</h2>
+        </div>
         <div class="user-profile">
-          <span>Hello, Alex</span>
-          <div class="avatar">A</div>
+          <span>Hello, Traveler</span>
+          <div class="avatar">T</div>
         </div>
       </header>
 
@@ -39,26 +138,105 @@
         <!-- Hero Banner injected by JS -->
         <div id="destination-hero"></div>
 
+        <!-- Page Navigation -->
+        <div class="page-navigation" id="page-nav">
+          <button class="page-btn" data-page="0" style="display: none;">← Back</button>
+          <span class="page-indicator" id="page-indicator"></span>
+          <button class="page-btn" data-page="1" style="display: none;">Next →</button>
+        </div>
+
         <!-- Split Layout for Hotels and Attractions -->
         <div class="split-layout">
           
           <div class="column">
-            <h3 class="section-title">Available Hotels</h3>
+            <h3 class="section-title">
+              <i class="fas fa-building"></i> Available Hotels
+            </h3>
             <ul id="hotel-list" class="card-list">
               <!-- Hotels injected by JS -->
             </ul>
           </div>
 
           <div class="column">
-            <h3 class="section-title">Top Attractions</h3>
+            <h3 class="section-title">
+              <i class="fas fa-map-marker-alt"></i> Top Attractions
+            </h3>
             <ul id="attraction-list" class="card-list">
               <!-- Attractions injected by JS -->
             </ul>
           </div>
 
         </div>
+
+        <!-- Restaurants/Dining Section -->
+        <div class="full-width-section">
+          <h3 class="section-title">
+            <i class="fas fa-utensils"></i> Local Restaurants & Dining
+          </h3>
+          <ul id="restaurant-list" class="card-list grid-3">
+            <!-- Restaurants injected by JS -->
+          </ul>
+        </div>
+
       </main>
 
+    </div>
+  </div>
+
+  <!-- DETAIL VIEW MODAL -->
+  <div class="detail-modal" id="detail-modal">
+    <div class="detail-overlay" id="detail-overlay"></div>
+    
+    <div class="detail-container">
+      <button class="detail-close-btn" id="detail-close">
+        <i class="fas fa-times"></i>
+      </button>
+
+      <!-- Tab Navigation -->
+      <div class="detail-tabs">
+        <button class="detail-tab-btn active" data-tab="overview">Overview</button>
+        <button class="detail-tab-btn" data-tab="map">Map & Location</button>
+        <button class="detail-tab-btn" data-tab="rooms">Rooms & Details</button>
+        <button class="detail-tab-btn" data-tab="nearby">Nearby</button>
+      </div>
+
+      <!-- Overview Tab -->
+      <div class="detail-tab-content active" id="tab-overview">
+        <div class="detail-header">
+          <h2 id="detail-title"></h2>
+          <div class="detail-rating">
+            <span id="detail-rating"></span>
+            <span id="detail-category" class="badge"></span>
+          </div>
+        </div>
+        <p id="detail-description" class="detail-description"></p>
+        <div id="detail-info-grid" class="detail-info-grid"></div>
+      </div>
+
+      <!-- Map Tab -->
+      <div class="detail-tab-content" id="tab-map">
+        <div class="detail-header">
+          <h3><i class="fas fa-map-location-dot"></i> Location & Map</h3>
+        </div>
+        <div id="detail-map" class="detail-map" style="height: 500px; border-radius: 12px; overflow: hidden;"></div>
+        <div id="detail-location-info" class="detail-location-info"></div>
+      </div>
+
+      <!-- Rooms Tab -->
+      <div class="detail-tab-content" id="tab-rooms">
+        <div class="detail-header">
+          <h3><i class="fas fa-door-open"></i> Available Rooms & Suites</h3>
+        </div>
+        <div id="rooms-list" class="rooms-grid"></div>
+      </div>
+
+      <!-- Nearby Tab -->
+      <div class="detail-tab-content" id="tab-nearby">
+        <div class="detail-header">
+          <h3><i class="fas fa-utensils"></i> Nearby Restaurants</h3>
+        </div>
+        <div id="nearby-restaurants" class="nearby-list"></div>
+      </div>
     </div>
   </div>
 
