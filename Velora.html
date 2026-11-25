@@ -3,243 +3,514 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Velora - Travel Dashboard</title>
-  <link rel="stylesheet" href="Velora.css">
+  <title>Velora - Luxury Global Travel & Destination Guide</title>
+  <meta name="description" content="Explore world-class destinations, luxury hotels, top attractions, and authentic dining across India and the globe.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
+  <link rel="dns-prefetch" href="https://images.unsplash.com">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- IMPORTANT: Replace YOUR_API_KEY with your actual Google Maps API key from https://console.cloud.google.com/ -->
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initializeGoogleMaps"></script>
+  
+  <!-- Leaflet Map Engine (Zero-configuration interactive maps) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <link rel="stylesheet" href="Velora.css?v=3.1">
 </head>
 <body>
 
+  <!-- MOBILE HAMBURGER BUTTON -->
+  <button class="menu-toggle" id="menu-toggle" aria-label="Toggle navigation menu">
+    <i class="fas fa-bars"></i>
+  </button>
+
   <div class="dashboard-container">
     
-    <!-- HAMBURGER MENU BUTTON (Mobile) -->
-    <button class="menu-toggle" id="menu-toggle">
-      <i class="fas fa-bars"></i>
-    </button>
-
-    <!-- SLIDING SIDEBAR MENU -->
+    <!-- SIDEBAR NAVIGATION & FILTERS (COLUMN 1) -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <div class="logo">Velora.</div>
-        <button class="close-btn" id="close-btn">
+        <div class="logo-group">
+          <div class="logo-mark"><i class="fas fa-compass"></i></div>
+          <div class="logo-text">Velora<span>.</span></div>
+        </div>
+        <button class="close-btn" id="close-btn" aria-label="Close menu">
           <i class="fas fa-times"></i>
         </button>
       </div>
 
-      <p class="sidebar-label">DESTINATIONS</p>
-      <nav id="nav-buttons">
-        <!-- Destination buttons injected by JS -->
-      </nav>
-
-      <div class="menu-divider"></div>
-      <p class="sidebar-label">QUICK STATS</p>
-      <div class="quick-stats">
-        <div class="stat-item">
-          <span class="stat-icon">🌍</span>
-          <span id="total-destinations">9</span> Destinations
-        </div>
-        <div class="stat-item">
-          <span class="stat-icon">🏨</span>
-          <span id="total-hotels">27</span> Hotels
-        </div>
-        <div class="stat-item">
-          <span class="stat-icon">🎯</span>
-          <span id="total-attractions">27</span> Attractions
+      <!-- SEARCH INPUT -->
+      <div class="sidebar-section">
+        <label class="sidebar-label" for="destination-search">Search Destination</label>
+        <div class="destination-search-box">
+          <i class="fas fa-search search-icon"></i>
+          <input id="destination-search" type="search" placeholder="City, state, or landmark..." autocomplete="off">
+          <button id="clear-search" type="button" aria-label="Clear search" title="Clear search">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
       </div>
 
-      <div class="menu-divider"></div>
-      <p class="sidebar-label">FIND YOUR DESTINATION</p>
-      <div class="destination-filters" aria-label="Destination filters">
-        <label class="filter-field" for="terrain-filter">
-          <span>Terrain</span>
-          <select id="terrain-filter" data-filter="terrain">
-            <option value="all">Any terrain</option>
-            <option value="alpine">Alpine</option>
-            <option value="coastal">Coastal</option>
-            <option value="rainforest">Rainforest</option>
-            <option value="urban">Urban</option>
-          </select>
-        </label>
-        <label class="filter-field" for="climate-filter">
-          <span>Climate</span>
-          <select id="climate-filter" data-filter="climate">
-            <option value="all">Any climate</option>
-            <option value="cold">Cold</option>
-            <option value="mediterranean">Mediterranean</option>
-            <option value="temperate">Temperate</option>
-            <option value="tropical">Tropical</option>
-          </select>
-        </label>
-        <label class="filter-field" for="cost-filter">
-          <span>Cost of living</span>
-          <select id="cost-filter" data-filter="costOfLiving">
-            <option value="all">Any cost</option>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </select>
-        </label>
-        <label class="filter-field" for="luxury-filter">
-          <span>Luxury level</span>
-          <select id="luxury-filter" data-filter="luxuryLevel">
-            <option value="all">Any luxury level</option>
-            <option value="standard">Standard</option>
-            <option value="upscale">Upscale</option>
-            <option value="luxury">Luxury</option>
-          </select>
-        </label>
-        <label class="filter-field" for="attraction-filter">
-          <span>Main attraction</span>
-          <select id="attraction-filter" data-filter="mainAttraction">
-            <option value="all">Any attraction</option>
-            <option value="adventure">Adventure</option>
-            <option value="beach">Beach</option>
-            <option value="culture">Culture</option>
-            <option value="nature">Nature</option>
-          </select>
-        </label>
-        <button class="clear-filters-btn" id="clear-filters" type="button">Clear filters</button>
+      <!-- CATEGORY PILLS -->
+      <div class="sidebar-section">
+        <div class="sidebar-label-row">
+          <span class="sidebar-label">Categories</span>
+        </div>
+        <div class="category-pills" id="category-pills">
+          <button class="category-pill active" data-category="all">
+            <i class="fas fa-globe-americas"></i> All
+          </button>
+          <button class="category-pill" data-category="Culture">
+            <i class="fas fa-monument"></i> Culture
+          </button>
+          <button class="category-pill" data-category="Mountain">
+            <i class="fas fa-mountain"></i> Mountain
+          </button>
+          <button class="category-pill" data-category="Beach">
+            <i class="fas fa-umbrella-beach"></i> Beach
+          </button>
+          <button class="category-pill" data-category="Nature">
+            <i class="fas fa-tree"></i> Nature
+          </button>
+          <button class="category-pill" data-category="Adventure">
+            <i class="fas fa-hiking"></i> Adventure
+          </button>
+        </div>
       </div>
 
-      <div class="menu-divider"></div>
-      <p class="sidebar-label">CATEGORIES</p>
-      <div class="category-filter">
-        <button class="category-btn active" data-category="all">All Destinations</button>
-        <button class="category-btn" data-category="Culture">Culture</button>
-        <button class="category-btn" data-category="Mountain">Mountain</button>
-        <button class="category-btn" data-category="Beach">Beach</button>
-        <button class="category-btn" data-category="Nature">Nature</button>
-        <button class="category-btn" data-category="Adventure">Adventure</button>
+      <!-- FILTER DROPDOWNS -->
+      <div class="sidebar-section">
+        <div class="sidebar-label-row">
+          <span class="sidebar-label">Refine By</span>
+          <button id="clear-filters" class="reset-link" type="button">Reset</button>
+        </div>
+        <div class="filter-controls">
+          <div class="filter-field">
+            <label for="region-filter"><i class="fas fa-map"></i> Region</label>
+            <div class="select-wrapper">
+              <select id="region-filter" data-filter="region">
+                <option value="all">All Regions</option>
+              </select>
+              <i class="fas fa-chevron-down select-chevron"></i>
+            </div>
+          </div>
+          <div class="filter-field">
+            <label for="terrain-filter"><i class="fas fa-layer-group"></i> Terrain</label>
+            <div class="select-wrapper">
+              <select id="terrain-filter" data-filter="terrain">
+                <option value="all">Any Terrain</option>
+              </select>
+              <i class="fas fa-chevron-down select-chevron"></i>
+            </div>
+          </div>
+          <div class="filter-field">
+            <label for="climate-filter"><i class="fas fa-cloud-sun"></i> Climate</label>
+            <div class="select-wrapper">
+              <select id="climate-filter" data-filter="climate">
+                <option value="all">Any Climate</option>
+              </select>
+              <i class="fas fa-chevron-down select-chevron"></i>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <!-- DESTINATIONS LIST -->
+      <div class="sidebar-section flex-grow">
+        <div class="sidebar-label-row">
+          <span class="sidebar-label">Destinations</span>
+          <span class="counter-badge" id="destination-count-badge">0</span>
+        </div>
+        
+        <nav class="destination-list" id="nav-buttons" aria-label="Destinations navigation">
+          <!-- Injected dynamically by JS -->
+        </nav>
+
+        <div class="destination-pagination" aria-label="Destination pagination">
+          <button id="destination-list-prev" class="pagi-btn" type="button" aria-label="Previous destinations">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <span id="destination-list-status" class="pagi-status" aria-live="polite">1-10 of 80</span>
+          <button id="destination-list-next" class="pagi-btn" type="button" aria-label="Next destinations">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- QUICK STATS -->
+      <div class="quick-stats-card">
+        <div class="stat-cell">
+          <span class="stat-value" id="total-destinations">80</span>
+          <span class="stat-name">Destinations</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-cell">
+          <span class="stat-value" id="total-hotels">240+</span>
+          <span class="stat-name">Hotels</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-cell">
+          <span class="stat-value" id="total-attractions">320+</span>
+          <span class="stat-name">Attractions</span>
+        </div>
+      </div>
+
     </aside>
 
-    <!-- OVERLAY (Mobile menu background) -->
-    <div class="sidebar-overlay" id="sidebar-overlay"></div>
-
-    <!-- MAIN CONTENT -->
+    <!-- MAIN VIEW WRAPPER (COLUMN 2) -->
     <div class="main-wrapper">
       
-      <!-- TOP NAVBAR -->
+      <!-- TOP NAVIGATION BAR -->
       <header class="top-nav">
         <div class="nav-left">
-          <h2 id="page-title">Dashboard Overview</h2>
+          <div class="current-destination-tag">
+            <span class="pulse-indicator"></span>
+            <span id="header-destination-name">Loading destination...</span>
+          </div>
         </div>
-        <div class="user-profile">
-          <span>Hello, Traveler</span>
-          <div class="avatar">T</div>
+        
+        <div class="nav-right">
+          <!-- CURRENCY PICKER -->
+          <div class="currency-picker-wrap" title="Change Currency">
+            <i class="fas fa-coins currency-icon"></i>
+            <select id="currency-select" class="currency-select" aria-label="Select currency">
+              <option value="USD">USD ($)</option>
+              <option value="EUR">EUR (€)</option>
+              <option value="GBP">GBP (£)</option>
+              <option value="INR">INR (₹)</option>
+              <option value="JPY">JPY (¥)</option>
+              <option value="AUD">AUD (A$)</option>
+            </select>
+          </div>
+
+          <!-- THEME TOGGLE (DARK / LIGHT) -->
+          <button class="nav-icon-btn" id="theme-toggle-btn" aria-label="Toggle Dark/Light Mode" title="Toggle Theme (Dark / Light)">
+            <i class="fas fa-moon" id="theme-icon"></i>
+          </button>
+
+          <!-- BUCKET LIST DRAWER BUTTON -->
+          <button class="nav-icon-btn bucket-list-btn" id="open-bucket-list-btn" aria-label="My Bucket List" title="My Saved Bucket List">
+            <i class="fas fa-heart"></i>
+            <span class="bucket-badge" id="bucket-badge-count">0</span>
+          </button>
+
+          <div class="search-hint">
+            <span class="kbd-hint">Press <strong>/</strong> to search</span>
+          </div>
+
+          <div class="user-profile">
+            <div class="user-info">
+              <span class="user-greeting">Welcome</span>
+              <strong class="user-name">Traveler</strong>
+            </div>
+            <div class="avatar">
+              <i class="fas fa-user"></i>
+            </div>
+          </div>
         </div>
       </header>
 
-      <!-- DYNAMIC DASHBOARD CONTENT -->
-      <main class="content">
+      <!-- DASHBOARD MAIN CONTENT -->
+      <main class="content" id="main-content">
         
-        <!-- Hero Banner injected by JS -->
-        <div id="destination-hero"></div>
+        <!-- HERO BANNER (Injected by JS) -->
+        <section id="destination-hero" class="hero-section" aria-label="Destination showcase"></section>
 
-        <!-- Page Navigation -->
-        <div class="page-navigation" id="page-nav">
-          <button class="page-btn" data-page="0" style="display: none;">← Back</button>
-          <span class="page-indicator" id="page-indicator"></span>
-          <button class="page-btn" data-page="1" style="display: none;">Next →</button>
-        </div>
+        <!-- SECTION: INTERACTIVE SATELLITE & DESTINATION MAP -->
+        <section id="destination-map-section" class="destination-map-section" aria-label="Interactive Satellite Map">
+          <div class="map-header-container">
+            <div class="map-title-group">
+              <div class="title-icon icon-map"><i class="fas fa-satellite"></i></div>
+              <div>
+                <h3 class="column-title" id="destination-map-title">Interactive Satellite Map</h3>
+                <p class="column-subtitle" id="destination-map-subtitle">High-resolution satellite view with curated hotels, landmarks, and attractions</p>
+              </div>
+            </div>
+            <div class="map-toolbar-actions">
+              <div class="map-filter-group" id="map-filter-group">
+                <button type="button" class="map-chip-btn active" data-map-filter="all">
+                  <i class="fas fa-layer-group"></i> All Locations (<span id="map-count-all">0</span>)
+                </button>
+                <button type="button" class="map-chip-btn" data-map-filter="hotels">
+                  <i class="fas fa-hotel"></i> Hotels (<span id="map-count-hotels">0</span>)
+                </button>
+                <button type="button" class="map-chip-btn" data-map-filter="attractions">
+                  <i class="fas fa-landmark"></i> Attractions (<span id="map-count-attractions">0</span>)
+                </button>
+              </div>
+              <button type="button" class="map-action-btn" id="map-route-btn" title="Toggle Curated Day Tour Route">
+                <i class="fas fa-route"></i> Tour Route
+              </button>
+              <button type="button" class="map-action-btn" id="map-recenter-btn" title="Re-center Map on Destination">
+                <i class="fas fa-crosshairs"></i> Center
+              </button>
+              <button type="button" class="map-action-btn" id="map-fullscreen-btn" title="Toggle Fullscreen Map View">
+                <i class="fas fa-expand"></i> Fullscreen
+              </button>
+            </div>
+          </div>
 
-        <!-- Split Layout for Hotels and Attractions -->
-        <div class="split-layout">
+          <div class="interactive-map-wrapper" id="map-wrapper-container">
+            <div id="main-interactive-map" class="main-map-canvas"></div>
+            
+            <!-- TOUR ROUTE FLOATING HUD -->
+            <div id="tour-route-hud" class="tour-route-hud" style="display: none;">
+              <div class="route-hud-header">
+                <div class="route-hud-title">
+                  <span class="route-pulse-dot"></span>
+                  <strong>Walking Tour Route</strong>
+                </div>
+                <span id="route-stats-text" class="route-stats">~3.8 km · 48 mins</span>
+                <button type="button" class="route-hud-close" id="close-route-hud" aria-label="Close tour route"><i class="fas fa-times"></i></button>
+              </div>
+              <div class="route-steps-strip" id="route-steps-strip"></div>
+            </div>
+
+            <div class="map-badge-overlay">
+              <span class="satellite-live-pill"><i class="fas fa-circle live-dot"></i> Google Satellite Engine</span>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- SECTION: HOTELS & ATTRACTIONS -->
+        <div class="dual-column-layout">
           
-          <div class="column">
-            <h3 class="section-title">
-              <i class="fas fa-building"></i> Available Hotels
-            </h3>
-            <ul id="hotel-list" class="card-list">
+          <!-- HOTELS COLUMN -->
+          <section class="content-column" aria-label="Available Hotels">
+            <div class="column-header">
+              <div class="column-title-group">
+                <div class="title-icon"><i class="fas fa-hotel"></i></div>
+                <div>
+                  <h3 class="column-title">Premier Accommodations</h3>
+                  <p class="column-subtitle">Hand-picked luxury stays & boutique resorts</p>
+                </div>
+              </div>
+              <div class="column-pagination-controls" id="hotel-pagi-controls">
+                <button id="hotel-prev-btn" class="mini-pagi-btn" aria-label="Previous hotels"><i class="fas fa-chevron-left"></i></button>
+                <span id="hotel-pagi-indicator" class="mini-pagi-indicator">1 / 1</span>
+                <button id="hotel-next-btn" class="mini-pagi-btn" aria-label="Next hotels"><i class="fas fa-chevron-right"></i></button>
+              </div>
+            </div>
+
+            <ul id="hotel-list" class="cards-grid">
               <!-- Hotels injected by JS -->
             </ul>
-          </div>
+          </section>
 
-          <div class="column">
-            <h3 class="section-title">
-              <i class="fas fa-map-marker-alt"></i> Top Attractions
-            </h3>
-            <ul id="attraction-list" class="card-list">
+          <!-- ATTRACTIONS COLUMN -->
+          <section class="content-column" aria-label="Top Attractions">
+            <div class="column-header">
+              <div class="column-title-group">
+                <div class="title-icon icon-attraction"><i class="fas fa-camera-retro"></i></div>
+                <div>
+                  <h3 class="column-title">Iconic Attractions & Sights</h3>
+                  <p class="column-subtitle">Must-see landmarks and cultural highlights</p>
+                </div>
+              </div>
+              <div class="column-pagination-controls" id="attraction-pagi-controls">
+                <button id="attraction-prev-btn" class="mini-pagi-btn" aria-label="Previous attractions"><i class="fas fa-chevron-left"></i></button>
+                <span id="attraction-pagi-indicator" class="mini-pagi-indicator">1 / 1</span>
+                <button id="attraction-next-btn" class="mini-pagi-btn" aria-label="Next attractions"><i class="fas fa-chevron-right"></i></button>
+              </div>
+            </div>
+
+            <ul id="attraction-list" class="cards-grid">
               <!-- Attractions injected by JS -->
             </ul>
+          </section>
+
+        </div>
+
+        <!-- SECTION: CURATED 3-DAY ITINERARY -->
+        <section id="destination-itinerary-section" class="full-width-section itinerary-section" aria-label="Curated 3-Day Itinerary">
+          <div class="column-header itinerary-header">
+            <div class="column-title-group">
+              <div class="title-icon icon-itinerary"><i class="fas fa-calendar-alt"></i></div>
+              <div>
+                <h3 class="column-title" id="itinerary-title">Curated 3-Day Travel Itinerary</h3>
+                <p class="column-subtitle" id="itinerary-subtitle">Hand-crafted smart itinerary featuring iconic highlights, premier dining, and scenic routes</p>
+              </div>
+            </div>
+            <div class="itinerary-actions">
+              <button type="button" class="itinerary-action-btn" id="copy-itinerary-btn" onclick="copyItineraryToClipboard()">
+                <i class="fas fa-copy"></i> Copy Plan
+              </button>
+              <button type="button" class="itinerary-action-btn print-btn" onclick="window.print()">
+                <i class="fas fa-print"></i> Print / PDF
+              </button>
+            </div>
+          </div>
+          <div class="itinerary-days-grid" id="itinerary-days-container">
+            <!-- Injected by JS -->
+          </div>
+        </section>
+
+        <!-- SECTION: LOCAL DINING & GASTRONOMY -->
+        <section class="full-width-section" aria-label="Local Dining">
+          <div class="column-header">
+            <div class="column-title-group">
+              <div class="title-icon icon-dining"><i class="fas fa-utensils"></i></div>
+              <div>
+                <h3 class="column-title">Gastronomy & Local Dining</h3>
+                <p class="column-subtitle">Authentic flavors, award-winning culinary craft, and regional dining</p>
+              </div>
+            </div>
           </div>
 
-        </div>
-
-        <!-- Restaurants/Dining Section -->
-        <div class="full-width-section">
-          <h3 class="section-title">
-            <i class="fas fa-utensils"></i> Local Restaurants & Dining
-          </h3>
-          <ul id="restaurant-list" class="card-list grid-3">
+          <ul id="restaurant-list" class="dining-cards-grid">
             <!-- Restaurants injected by JS -->
           </ul>
-        </div>
+        </section>
+
+        <!-- FOOTER -->
+        <!-- LUXURY DASHBOARD FOOTER -->
+        <footer class="dashboard-footer" role="contentinfo">
+          <div class="footer-grid">
+            <div class="footer-brand-col">
+              <div class="footer-logo">
+                <i class="fas fa-compass footer-compass-icon"></i> Velora<span>.</span>
+              </div>
+              <p class="footer-tagline">Curated Luxury Travel Intelligence & Verified Global Destinations</p>
+              <div class="footer-status-badge">
+                <span class="status-pulse-dot"></span>
+                <span>Verified Satellite Coordinates & Offline Engine Active</span>
+              </div>
+            </div>
+
+            <div class="footer-nav-col">
+              <h4 class="footer-heading">Platform Features</h4>
+              <ul class="footer-nav-list">
+                <li><a href="#destination-map-section"><i class="fas fa-satellite"></i> Satellite Map & Walking Route</a></li>
+                <li><a href="#itinerary-section"><i class="fas fa-calendar-alt"></i> Curated 3-Day Travel Itineraries</a></li>
+                <li><a href="#hotels-column"><i class="fas fa-hotel"></i> Handpicked Accommodations</a></li>
+                <li><a href="#attractions-column"><i class="fas fa-landmark"></i> Cultural Landmarks</a></li>
+              </ul>
+            </div>
+
+            <div class="footer-info-col">
+              <h4 class="footer-heading">Travel Intelligence</h4>
+              <p class="footer-info-text">Real-time multi-currency pricing, procedural ambient soundscapes, and persistent bucket lists powered by the Velora Engine.</p>
+              <div class="footer-copyright">
+                &copy; 2026 Velora Inc. All rights reserved.
+              </div>
+            </div>
+          </div>
+        </footer>
 
       </main>
 
     </div>
   </div>
 
-  <!-- DETAIL VIEW MODAL -->
-  <div class="detail-modal" id="detail-modal">
+  <!-- MOBILE OVERLAY (OUTSIDE GRID) -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- DETAIL MODAL (OUTSIDE GRID) -->
+  <div class="detail-modal" id="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title">
     <div class="detail-overlay" id="detail-overlay"></div>
     
     <div class="detail-container">
-      <button class="detail-close-btn" id="detail-close">
+      <button class="detail-close-btn" id="detail-close" aria-label="Close details dialog">
         <i class="fas fa-times"></i>
       </button>
 
-      <!-- Tab Navigation -->
-      <div class="detail-tabs">
-        <button class="detail-tab-btn active" data-tab="overview">Overview</button>
-        <button class="detail-tab-btn" data-tab="map">Map & Location</button>
-        <button class="detail-tab-btn" data-tab="rooms">Rooms & Details</button>
-        <button class="detail-tab-btn" data-tab="nearby">Nearby</button>
+      <!-- MODAL HERO -->
+      <div class="modal-hero-header">
+        <div class="modal-hero-copy">
+          <span id="detail-category" class="badge">Category</span>
+          <h2 id="detail-title">Title Here</h2>
+          <div class="detail-rating-row" id="detail-rating"></div>
+        </div>
       </div>
 
-      <!-- Overview Tab -->
-      <div class="detail-tab-content active" id="tab-overview">
-        <div class="detail-header">
-          <h2 id="detail-title"></h2>
-          <div class="detail-rating">
-            <span id="detail-rating"></span>
-            <span id="detail-category" class="badge"></span>
+      <!-- TABS HEADER -->
+      <div class="detail-tabs" role="tablist">
+        <button class="detail-tab-btn active" data-tab="overview" role="tab" aria-selected="true">
+          <i class="fas fa-info-circle"></i> Overview
+        </button>
+        <button class="detail-tab-btn" data-tab="map" role="tab" aria-selected="false">
+          <i class="fas fa-map-marked-alt"></i> Map & Location
+        </button>
+        <button class="detail-tab-btn" data-tab="rooms" role="tab" aria-selected="false">
+          <i class="fas fa-bed"></i> Rooms & Suites
+        </button>
+        <button class="detail-tab-btn" data-tab="nearby" role="tab" aria-selected="false">
+          <i class="fas fa-utensils"></i> Dining & Nearby
+        </button>
+      </div>
+
+      <!-- TAB: OVERVIEW -->
+      <div class="detail-tab-content active" id="tab-overview" role="tabpanel">
+        <p id="detail-description" class="detail-description-lead"></p>
+        <div id="detail-info-grid" class="detail-info-grid"></div>
+        <div id="detail-extra-highlights" class="detail-extra-highlights"></div>
+      </div>
+
+      <!-- TAB: MAP -->
+      <div class="detail-tab-content" id="tab-map" role="tabpanel">
+        <div class="map-wrapper">
+          <div id="detail-map" class="detail-map-canvas"></div>
+          <div class="map-navigation-bar">
+            <span id="map-coordinates-text" class="coordinates-badge"></span>
+            <a id="open-external-maps-btn" href="#" target="_blank" rel="noopener noreferrer" class="external-maps-btn">
+              <i class="fas fa-directions"></i> Get Directions in Google Maps
+            </a>
           </div>
         </div>
-        <p id="detail-description" class="detail-description"></p>
-        <div id="detail-info-grid" class="detail-info-grid"></div>
+        <div id="detail-location-info" class="location-cards-grid"></div>
       </div>
 
-      <!-- Map Tab -->
-      <div class="detail-tab-content" id="tab-map">
-        <div class="detail-header">
-          <h3><i class="fas fa-map-location-dot"></i> Location & Map</h3>
-        </div>
-        <div id="detail-map" class="detail-map" style="height: 500px; border-radius: 12px; overflow: hidden;"></div>
-        <div id="detail-location-info" class="detail-location-info"></div>
+      <!-- TAB: ROOMS -->
+      <div class="detail-tab-content" id="tab-rooms" role="tabpanel">
+        <div id="rooms-list" class="rooms-cards-grid"></div>
       </div>
 
-      <!-- Rooms Tab -->
-      <div class="detail-tab-content" id="tab-rooms">
-        <div class="detail-header">
-          <h3><i class="fas fa-door-open"></i> Available Rooms & Suites</h3>
-        </div>
-        <div id="rooms-list" class="rooms-grid"></div>
-      </div>
-
-      <!-- Nearby Tab -->
-      <div class="detail-tab-content" id="tab-nearby">
-        <div class="detail-header">
-          <h3><i class="fas fa-utensils"></i> Nearby Restaurants</h3>
-        </div>
-        <div id="nearby-restaurants" class="nearby-list"></div>
+      <!-- TAB: NEARBY -->
+      <div class="detail-tab-content" id="tab-nearby" role="tabpanel">
+        <div id="nearby-restaurants" class="nearby-cards-grid"></div>
       </div>
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <!-- BOOKING NOTIFICATION TOAST (OUTSIDE GRID) -->
+  <div id="toast-notification" class="toast-notification" role="status" aria-live="polite">
+    <div class="toast-icon"><i class="fas fa-check-circle"></i></div>
+    <div class="toast-body">
+      <strong id="toast-title">Booking Requested</strong>
+      <p id="toast-message">Your reservation details have been confirmed.</p>
+    </div>
+  </div>
+
+  <!-- SCRIPTS WITH CACHE-BUSTER -->
+  <script src="destination-data.js?v=3.0"></script>
+  <script src="app.js?v=3.1"></script>
+
+  <!-- SLIDE-OVER BUCKET LIST DRAWER -->
+  <aside class="bucket-drawer" id="bucket-drawer" aria-label="Saved Destinations and Favorites" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="bucket-drawer-header">
+      <div class="bucket-drawer-title">
+        <i class="fas fa-heart" style="color: #ef4444;"></i>
+        <h3>My Bucket List</h3>
+        <span class="bucket-count-pill" id="drawer-bucket-count">0 saved</span>
+      </div>
+      <button class="bucket-close-btn" id="close-bucket-drawer-btn" aria-label="Close bucket list"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="bucket-drawer-tabs">
+      <button class="bucket-tab-btn active" data-bucket-filter="all">All</button>
+      <button class="bucket-tab-btn" data-bucket-filter="destination">Destinations</button>
+      <button class="bucket-tab-btn" data-bucket-filter="hotel">Hotels</button>
+      <button class="bucket-tab-btn" data-bucket-filter="attraction">Attractions</button>
+    </div>
+    <div class="bucket-drawer-content" id="bucket-drawer-items">
+      <!-- Injected by JS -->
+    </div>
+    <div class="bucket-drawer-footer">
+      <button class="bucket-clear-btn" id="clear-bucket-btn"><i class="fas fa-trash-alt"></i> Clear All</button>
+      <button class="bucket-export-btn" id="export-bucket-btn"><i class="fas fa-share-alt"></i> Share List</button>
+    </div>
+  </aside>
+  <div class="bucket-drawer-overlay" id="bucket-drawer-overlay"></div>
+
 </body>
 </html>
